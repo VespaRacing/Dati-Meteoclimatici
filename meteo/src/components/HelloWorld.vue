@@ -1,90 +1,121 @@
 <template>
   <div>
-    <div v-if="excelData.length">
-      <h3>Imported Data:</h3>
-      <!-- First Grid -->
-      <h4>Grid 1</h4>
-      <table>
-        <thead>
-          <tr>
-            <th v-for="(header, index) in excelData[0]" :key="index">{{ header }}</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(row, rowIndex) in excelData.slice(1)" :key="rowIndex">
-            <td v-for="(cell, cellIndex) in row" :key="cellIndex">{{ cell }}</td>
-          </tr>
-        </tbody>
-      </table>
 
-      <!-- First Chart -->
-      <h4>Chart 1</h4>
-      <apexchart type="bar" height="350" :options="chartOptions" :series="chartData.series"></apexchart>
+    <template #layers>
+      <Grid strokeDasharray="2,2" />
+      <Bar :dataKeys="['name', 'pl']" :barStyle="{ fill: '#90e0ef' }" />
+      <Bar :dataKeys="['name', 'avg']" :barStyle="{ fill: '#0096c7' }" />
+      <Bar :dataKeys="['name', 'inc']" :barStyle="{ fill: '#48cae4' }" />
+      <Marker :value="1000" label="Avg." color="#e76f51" strokeWidth="2" strokeDasharray="6 6" />
+    </template>
 
-      <!-- Second Grid (Copying data from the first for demonstration purposes) -->
-      <h4>Grid 2</h4>
-      <table>
-        <thead>
-          <tr>
-            <th v-for="(header, index) in excelData[0]" :key="index">{{ header }}</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(row, rowIndex) in excelData.slice(1)" :key="rowIndex">
-            <td v-for="(cell, cellIndex) in row" :key="cellIndex">{{ cell }}</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <!-- Second Chart (Copying data from the first for demonstration purposes) -->
-      <h4>Chart 2</h4>
-      <apexchart type="line" height="350" :options="chartOptions" :series="chartData.series"></apexchart>
+    <template #widgets>
+      <Tooltip
+        borderColor="#48CAE4"
+        :config="{
+          pl: { color: '#90e0ef' },
+          avg: { color: '#0096c7' },
+          inc: { color: '#48cae4' }
+        }"
+      />
+    </template>
     </div>
+
+
+    <!-- Temperature Data Grid -->
+    <div v-if="this.temps">
+      <h3>Temperature Registrate</h3>
+      <table>
+        <thead>
+          <tr>
+            <th v-for="(header, index) in temps[0]" :key="'temp-header-' + index">{{ header }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(row, rowIndex) in temps.slice(1)" :key="'temp-row-' + rowIndex">
+            <td v-for="(cell, cellIndex) in row" :key="'temp-cell-' + cellIndex">{{ cell }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Precipitation Data Grid -->
+    <div v-if="this.prec">
+      <h3>Precipitazioni Medie Registrate</h3>
+      <table>
+        <thead>
+          <tr>
+            <th v-for="(header, index) in prec[0]" :key="'prec-header-' + index">{{ header }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(row, rowIndex) in prec.slice(1)" :key="'prec-row-' + rowIndex">
+            <td v-for="(cell, cellIndex) in row" :key="'prec-cell-' + cellIndex">{{ cell }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
   </div>
 </template>
 
 <script>
-import * as XLSX from "xlsx";
-import VueApexCharts from "vue-apexcharts";
+//import VueApexCharts from 'vue3-apexcharts'
+import * as XLSX from 'xlsx';
 
 export default {
   components: {
-    apexchart: VueApexCharts
+    //apexchart: VueApexCharts,
   },
   data() {
     return {
       temps: [],
       prec: [],
-      excelData: [],
       chartOptions: {
         chart: {
-          id: 'vuechart-example'
+          toolbar: {
+            show: true
+          }
         },
         xaxis: {
           categories: []
         }
       },
       chartData: {
-        series: []
+        temps: [],
+        prec: []
       }
     };
   },
   mounted() {
-    this.loadExcelFile('/data.xlsx', this.temps);
-    this.loadExcelFile('/precipitazioni.xlsx', this.excelData);
+    this.loadExcelFile();
   },
   methods: {
-    async loadExcelFile(path, array) {
+    async loadExcelFile() {
       try {
-        const response = await fetch(path);
+        const response = await fetch('/data.xlsx');
         const arrayBuffer = await response.arrayBuffer();
         const data = new Uint8Array(arrayBuffer);
         const workbook = XLSX.read(data, { type: 'array' });
         const firstSheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[firstSheetName];
         const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-        array = jsonData;
+        this.temps = jsonData;
         this.processData(jsonData);
+
+        
+        const response2 = await fetch('/precipitazioni.xlsx');
+        const arrayBuffer2 = await response2.arrayBuffer();
+        const data2 = new Uint8Array(arrayBuffer2);
+        const workbook2 = XLSX.read(data2, { type: 'array' });
+        const firstSheetName2 = workbook2.SheetNames[0];
+        const worksheet2 = workbook2.Sheets[firstSheetName2];
+        const jsonData2 = XLSX.utils.sheet_to_json(worksheet2, { header: 1 });
+        this.prec = jsonData2;
+        this.processData(jsonData2);
+
+        console.log(this.temps);
+        console.log(this.prec);
       } catch (error) {
         console.error("Error loading or processing the Excel file:", error);
       }

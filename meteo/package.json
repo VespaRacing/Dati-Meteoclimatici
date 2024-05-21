@@ -9,10 +9,13 @@
   },
   "dependencies": {
     "apexcharts": "^3.49.1",
+    "chart.js": "^3.9.1",
     "core-js": "^3.8.3",
     "vue": "^3.2.13",
     "vue-apexcharts": "^1.6.2",
+    "vue-chart-3": "^3.1.8",
     "vue-router": "^4.0.3",
+    "vue3-apexcharts": "^1.5.3",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
