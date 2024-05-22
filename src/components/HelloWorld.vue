@@ -1,47 +1,49 @@
 <template>
-  <div>
+  <div class="data-container">
     <!-- Editable Grid for Temperature Data -->
-    <div v-if="temps.length">
-      <button class="button1" @click="addNewYearColumn('temp')">Nuovo Anno</button>
+    <div class="data-section" v-if="temps.length">
       <h3>Tabella Temperature:</h3>
-      <table>
+      <button class="add-button" @click="addNewYearColumn('temp')">+ Nuovo Anno</button>
+      <table class="data-table">
         <thead>
           <tr>
-            <th v-for="(header, index) in temps[0]" :key="'temp-header-' + index">{{ header }}</th>
+            <th v-for="(header, index) in temps[0]" :key="'temp-header-' + index" :class="{ 'first-column': index === 0 }">
+              {{ header }}
+            </th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="(row, rowIndex) in temps.slice(1)" :key="'temp-row-' + rowIndex">
-            <td v-for="(cell, cellIndex) in row" :key="'temp-cell-' + cellIndex">
-              <input v-model="temps[rowIndex + 1][cellIndex]" @change="saveToLocalStorage" />
+            <td v-for="(cell, cellIndex) in row" :key="'temp-cell-' + cellIndex" :class="{ 'first-column': cellIndex === 0 }">
+              <input class="table-input" v-model="temps[rowIndex + 1][cellIndex]" @change="saveToLocalStorage" />
             </td>
           </tr>
         </tbody>
       </table>
-      <!-- Temperature Chart -->
-      <apexchart type="bar" :options="tempChartOptions" :series="tempChartData"></apexchart>
+      <apexchart type="bar" :options="tempChartOptions" :series="tempChartData" height="350"></apexchart>
     </div>
 
     <!-- Editable Grid for Precipitation Data -->
-    <div v-if="prec.length">
+    <div class="data-section" v-if="prec.length">
       <h3>Tabella Precipitazioni:</h3>
-      <button @click="addNewYearColumn('prec')">Nuovo Anno</button>
-      <table>
+      <button class="add-button" @click="addNewYearColumn('prec')">+ Nuovo Anno</button>
+      <table class="data-table">
         <thead>
           <tr>
-            <th v-for="(header, index) in prec[0]" :key="'prec-header-' + index">{{ header }}</th>
+            <th v-for="(header, index) in prec[0]" :key="'prec-header-' + index" :class="{ 'first-column': index === 0 }">
+              {{ header }}
+            </th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="(row, rowIndex) in prec.slice(1)" :key="'prec-row-' + rowIndex">
-            <td v-for="(cell, cellIndex) in row" :key="'prec-cell-' + cellIndex">
-              <input v-model="prec[rowIndex + 1][cellIndex]" @change="saveToLocalStorage" />
+            <td v-for="(cell, cellIndex) in row" :key="'prec-cell-' + cellIndex" :class="{ 'first-column': cellIndex === 0 }">
+              <input class="table-input" v-model="prec[rowIndex + 1][cellIndex]" @change="saveToLocalStorage" />
             </td>
           </tr>
         </tbody>
       </table>
-      <!-- Precipitation Chart -->
-      <apexchart type="bar" :options="precChartOptions" :series="precChartData"></apexchart>
+      <apexchart type="bar" :options="precChartOptions" :series="precChartData" height="350"></apexchart>
     </div>
   </div>
 </template>
@@ -189,44 +191,56 @@ export default {
 </script>
 
 <style scoped>
-table {
-  border-collapse: collapse;
-  width: 100%;
+.data-container {
+  margin: 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-th,
-td {
-  border: 1px solid black;
+.data-section {
+  background: #ffffff;
+  padding: 20px;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  border-radius: 8px;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.data-table th, .data-table td {
+  border: 1px solid #ddd;
   padding: 8px;
   text-align: left;
 }
 
-input {
-  width: 100%;
+.data-table th.first-column, .data-table td.first-column {
+  width: 10%;  /* Set double width for the first column */
+}
+
+.data-table th {
+  background-color: #f4f4f4;
+}
+
+.table-input {
+  width: 80%;
+  padding: 5px;
+  box-sizing: border-box;
+}
+
+.add-button {
+  background-color: #4CAF50;
+  color: white;
   border: none;
-  background-color: transparent;
+  padding: 10px 20px;
+  margin: 10px 0;
+  border-radius: 5px;
+  cursor: pointer;
 }
 
-button {
-  padding: 5px 15px;
-  background: #ccc;
-  border: 0 none;
-  margin-left: -1300px;
-  margin-bottom: 30px;
-  height: 50px;
-  cursor: pointer;
-  -webkit-border-radius: 5px;
-  border-radius: 5px;
-}
-
-button1 {
-  padding: 5px 15px;
-  background: #ccc;
-  border: 0 none;
-  margin-bottom: 30px;
-  height: 50px;
-  cursor: pointer;
-  -webkit-border-radius: 5px;
-  border-radius: 5px;
+.add-button:hover {
+  background-color: #45a049;
 }
 </style>
