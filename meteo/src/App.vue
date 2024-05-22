@@ -1,7 +1,8 @@
 <template>
   <nav>
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
+    <router-link to="/">Dati Grafici</router-link> |
+    <router-link to="/classifica">Classifica</router-link> |
+    <router-link to="/regioni">Regioni</router-link>
   </nav>
   <router-view/>
 </template>
