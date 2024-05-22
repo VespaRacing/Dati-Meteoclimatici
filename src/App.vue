@@ -4,6 +4,7 @@
     <button class="button-link" @click="navigateTo('/classifica')">Classifica</button> |
     <button class="button-link" @click="navigateTo('/regioni')">Regioni</button>
   </nav>
+  <h1>MADE BY RAMPI</h1>
   <router-view/>
 </template>
 
