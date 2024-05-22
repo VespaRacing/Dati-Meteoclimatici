@@ -116,6 +116,7 @@ export default {
         const worksheet = workbook.Sheets[firstSheetName];
         const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
         this.temps = jsonData;
+        this.saveToLocalStorage();
       }
       this.updateChartData(this.temps, this.tempChartData, this.tempChartOptions);
       if (storedPrec) {
@@ -131,6 +132,7 @@ export default {
         const worksheet2 = workbook2.Sheets[firstSheetName2];
         const jsonData2 = XLSX.utils.sheet_to_json(worksheet2, { header: 1 });
         this.prec = jsonData2;
+        this.saveToLocalStorage();
       }
       console.log(this.temps);
       this.updateChartData(this.prec, this.precChartData, this.precChartOptions);

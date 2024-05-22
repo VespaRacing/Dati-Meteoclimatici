@@ -20,18 +20,13 @@
     </div>
 
     <!-- Bar Chart for Top 10 Temperatures -->
-    <apexchart
-      type="bar"
-      :options="chartOptions"
-      :series="chartSeries"
-      height="350">
+    <apexchart type="bar" :options="chartOptions" :series="chartSeries" height="350">
     </apexchart>
   </div>
 </template>
 
 <script>
 import VueApexCharts from 'vue3-apexcharts'
-import * as XLSX from "xlsx";
 
 export default {
   name: 'ClassificaView',
@@ -64,30 +59,51 @@ export default {
       chartSeries: [{
         name: 'Temperature',
         data: []
-      }]
+      }],
+      jsonRegioni: {},
+      regioni: []
     };
   },
   async mounted() {
-    await this.loadData();
+    fetch('regioni.json')
+      .then(response => response.json())
+      .then(data => {
+        for (let region in data) {
+          this.regioni.push({ region: region, cities: data[region], temps: [] });
+        }
+      })
+      .catch(error => console.error('Error reading the file:', error));
+    this.loadData();
   },
   methods: {
-    
     async loadData() {
       let storedTemps = localStorage.getItem('temperatureData');
-      if (storedTemps) {
-        this.temps = JSON.parse(storedTemps);
-      }
-      else{
-          // Load and process temperature data
-        const response = await fetch('/data.xlsx');
-        const arrayBuffer = await response.arrayBuffer();
-        const data = new Uint8Array(arrayBuffer);
-        const workbook = XLSX.read(data, { type: 'array' });
-        const firstSheetName = workbook.SheetNames[0];
-        const worksheet = workbook.Sheets[firstSheetName];
-        const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-        this.temps = jsonData;
-      }
+      this.temps = JSON.parse(storedTemps);
+
+      this.temps.forEach(item2 => {
+        item2.forEach(item => {
+          if (!isNaN(item)) {
+            this.regioni.forEach(regione => {
+              console.log(regione)
+              regione.cities.forEach(città => {
+                console.log(città);
+                if (città == item2[0]) {
+                  console.log("contiene")
+                  let count = 0;
+                  item.forEach(temperatura => {
+                    if (count != 0) {
+                      regione.temps.push(temperatura)
+                    }
+                    else {
+                      count++;
+                    }
+                  })
+                }
+              })
+            })
+          }
+        })
+      })
       this.processTemperatureData(this.temps);
     },
     processTemperatureData(data) {
@@ -113,11 +129,14 @@ table {
   width: 100%;
   margin-top: 20px;
 }
-th, td {
+
+th,
+td {
   border: 1px solid #ddd;
   padding: 8px;
   text-align: left;
 }
+
 th {
   background-color: #f4f4f4;
 }
